@@ -7,6 +7,8 @@ byte button1_lock = 0;
 byte button2_lock = 0;
 unsigned long pressTime1 = 0;
 unsigned long pressTime2 = 0;
+unsigned long repeatTime1 = 0;
+unsigned long repeatTime2 = 0;
 
 void setup() {
 	pinMode(BUTTON1, INPUT_PULLUP);
@@ -17,17 +19,7 @@ void setup() {
 	delay(10);
 }
 
-void loop() {
-	if (press(BUTTON1)) {
-		led = !led;
-	}
-	if (release(BUTTON2)) {
-		led = !led;
-	}
-	digitalWrite(LED, led);
-}
-
-boolean press(int button) {
+boolean press(int button, boolean repeat = false, int repeatSpeed = 250, int repeatDelay = 1000) {
 	boolean activate = false;
 	if (!button1_lock && digitalRead(button) == LOW) {
 		// button pressed
@@ -36,9 +28,14 @@ boolean press(int button) {
 		pressTime1 = millis();
 		Serial.print("press: ");
 		Serial.println(pressTime1);
-	} else if (button1_lock && millis() - pressTime1 > 1000 && digitalRead(button) == LOW) {
+	} else if (button1_lock && millis() - pressTime1 > repeatDelay && digitalRead(button) == LOW && repeat) {
 		// repeat button presses
-		button1_lock = 0;
+		if (millis() - repeatTime1 > repeatSpeed) {
+			activate = true;
+			repeatTime1 = millis();
+			Serial.print("repeat press: ");
+			Serial.println(repeatTime1);
+		}
 	} else if (button1_lock && digitalRead(button) == HIGH) {
 		// debounce
 		button1_lock++;
@@ -46,19 +43,20 @@ boolean press(int button) {
 	return activate;
 }
 
-boolean release(int button) {
+boolean release(int button, boolean repeat = false, int repeatSpeed = 250, int repeatDelay = 2000) {
 	boolean activate = false;
 	if (!button2_lock && digitalRead(button) == LOW) {
 		// button pressed
 		button2_lock = 1;
 		pressTime2 = millis();
-	} else if (button2_lock && millis() - pressTime2 > 2000 && digitalRead(button) == LOW) {
+	} else if (button2_lock && millis() - pressTime2 > repeatDelay && digitalRead(button) == LOW && repeat) {
 		// repeat button presses(releases)
-		button2_lock = 1;
-		activate = true;
-		pressTime2 = millis();
-		Serial.print("release: ");
-		Serial.println(pressTime2);
+		if (millis() - repeatTime2 > repeatSpeed) {
+			activate = true;
+			repeatTime2 = millis();
+			Serial.print("repeat release: ");
+			Serial.println(repeatTime2);
+		}
 	} else if (button2_lock && digitalRead(button) == HIGH) {
 		// debounce
 		button2_lock++;
@@ -70,4 +68,14 @@ boolean release(int button) {
 		}
 	}
 	return activate;
+}
+
+void loop() {
+	if (press(BUTTON1, true, 100, 1500)) {
+		led = !led;
+	}
+	if (release(BUTTON2, true, 200, 2000)) {
+		led = !led;
+	}
+	digitalWrite(LED, led);
 }

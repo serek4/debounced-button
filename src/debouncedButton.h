@@ -34,6 +34,11 @@ class button {
 	 */
 	boolean repeat(int _repeatSpeed1 = 400, int _repeatSpeed2 = 100, int _repeatSpeed2delay = 1500);
 	/**
+	 * button activated after specified time
+	 * @param _pressDelay: hold time [in milliseconds], default = 2000
+	 */
+	boolean longPress(int _pressDelay = 2000);
+	/**
 	 * button activated on relese
 	 */
 	boolean relese();
@@ -48,4 +53,5 @@ class button {
 #endif
 	unsigned long _repeatedPress = 0;
 	boolean _press;
+	boolean _longPressLock = false;
 };

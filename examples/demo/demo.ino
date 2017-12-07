@@ -33,13 +33,19 @@ void loop() {
 			}
 			break;
 		case 1:
-			if (button2.relese()) {
+			if (button2.repeat()) {
 				led2State = !led2State;
 				digitalWrite(LED2, led2State);
 			}
 			break;
 		case 2:
-			if (button2.repeat()) {
+			if (button2.longPress()) {
+				led2State = !led2State;
+				digitalWrite(LED2, led2State);
+			}
+			break;
+		case 3:
+			if (button2.relese()) {
 				led2State = !led2State;
 				digitalWrite(LED2, led2State);
 			}

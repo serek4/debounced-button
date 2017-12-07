@@ -63,6 +63,29 @@ boolean button::repeat(int _repeatSpeed1, int _repeatSpeed2, int _repeatSpeed2de
 	return _press;
 }
 
+boolean button::longPress(int _pressDelay) {
+	_press = false;
+	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+		_longPressLock = false;
+		_buttonPressed = _debounceTimer;
+		_pressTime = millis();
+	} else if (_buttonPressed && millis() - _pressTime > _pressDelay && digitalRead(_pin) == LOW) {    // long press
+		if (!_longPressLock) {
+			_press = true;
+			_longPressLock = true;
+#if DEBUG
+			_releaseTime = millis();
+			Serial.print(_pin);
+			Serial.print(" LongPress: ");
+			Serial.println(_releaseTime);
+#endif
+		}
+	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+		_buttonPressed++;
+	}
+	return _press;
+}
+
 boolean button::relese() {
 	_press = false;
 	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press

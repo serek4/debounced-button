@@ -17,6 +17,7 @@ press   KEYWORD2
 repeat  KEYWORD2
 longPress   KEYWORD2
 release  KEYWORD2
+hold    KEYWORD2
 
 #######################################
 # (KEYWORD3)

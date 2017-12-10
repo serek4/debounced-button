@@ -50,6 +50,14 @@ void loop() {
 				digitalWrite(LED2, led2State);
 			}
 			break;
+		case 4:
+			if (button2.hold()) {
+				led2State = true;
+			} else {
+				led2State = false;
+			}
+			digitalWrite(LED2, led2State);
+			break;
 		default:
 			mode = 0;
 			break;

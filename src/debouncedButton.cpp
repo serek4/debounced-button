@@ -104,3 +104,29 @@ boolean button::relese() {
 	}
 	return _press;
 }
+
+boolean button::hold(int _pressDelay) {
+	_press = false;
+	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+		_buttonPressed = _debounceTimer;
+		_pressTime = millis();
+#if DEBUG
+		Serial.print(_pin);
+		Serial.print(" hold start: ");
+		Serial.println(_pressTime);
+#endif
+	} else if (_buttonPressed && millis() - _pressTime > _pressDelay && digitalRead(_pin) == LOW) {    // hold
+		_press = true;
+	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+		_buttonPressed++;
+#if DEBUG
+		if (!_buttonPressed) {
+			_releaseTime = millis();
+			Serial.print(_pin);
+			Serial.print(" hold stop: ");
+			Serial.println(_releaseTime);
+		}
+#endif
+	}
+	return _press;
+}

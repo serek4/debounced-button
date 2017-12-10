@@ -42,6 +42,11 @@ class button {
 	 * button activated on relese
 	 */
 	boolean relese();
+	/**
+	 * button active as long as it is pressed
+	 * @param _pressDelay: hold time [in milliseconds], default = 0
+	 */
+	boolean hold(int _pressDelay = 0);
 
   private:
 	int _pin;

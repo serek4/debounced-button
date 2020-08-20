@@ -62,5 +62,5 @@ class button {
 	boolean _press;
 	boolean _longPressLock = false;
 	boolean _active = LOW;
-	boolean _readButtonStatus(int _pin);
+	boolean _readButtonStatus();
 };

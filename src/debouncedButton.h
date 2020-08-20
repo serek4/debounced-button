@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Arduino.h"
+#include <PCF8574.h>
 
 // Serial monitor debug, you need initialize Serial monitor in sketch. [0 = off, 1 = on]
 #ifndef DEBUG
@@ -24,6 +25,8 @@ class button {
      */
 	button(int pin, DEBOUNCERANGE debounceTimer = 1);
 	button(int pin, int active, DEBOUNCERANGE debounceTimer = 1);
+	button(int pin, PCF8574 &pcf8574, DEBOUNCERANGE debounceTimer = 1);
+	button(int pin, PCF8574 &pcf8574, int active, DEBOUNCERANGE debounceTimer = 1);
 	/**
 	 * button activated on press
 	 */
@@ -62,5 +65,6 @@ class button {
 	boolean _press;
 	boolean _longPressLock = false;
 	boolean _active = LOW;
+	PCF8574 *_pcf8574;
 	boolean _readButtonStatus();
 };

@@ -2,23 +2,47 @@
 
 #include "debouncedButton.h"
 
-button::button(int pin, DEBOUNCERANGE debounceTimer) {
+button::button(int pin, DEBOUNCERANGE debounceTimer)
+    : _pcf8574(nullptr) {
 	pinMode(pin, INPUT_PULLUP);
 	_pin = pin;
 	_debounceTimer = debounceTimer;
 	_active = LOW;
 }
 
-button::button(int pin, int active, DEBOUNCERANGE debounceTimer) {
+button::button(int pin, int active, DEBOUNCERANGE debounceTimer)
+    : _pcf8574(nullptr) {
 	pinMode(pin, INPUT);
 	_pin = pin;
 	_debounceTimer = debounceTimer;
 	_active = active;
 }
 
+button::button(int pin, PCF8574 &pcf8574, DEBOUNCERANGE debounceTimer)
+    : _pcf8574(&pcf8574) {
+	_pcf8574->pinMode(pin, INPUT_PULLUP);
+	_pin = pin;
+	_debounceTimer = debounceTimer;
+	_active = LOW;
+}
+
+button::button(int pin, PCF8574 &pcf8574, int active, DEBOUNCERANGE debounceTimer)
+    : _pcf8574(&pcf8574) {
+	_pcf8574->pinMode(pin, INPUT);
+	_pin = pin;
+	_debounceTimer = debounceTimer;
+	_active = active;
+}
+
 boolean button::_readButtonStatus() {
-	if (digitalRead(_pin) == _active ? HIGH : LOW) {
-		return true;
+	if (_pcf8574 != nullptr) {
+		if (_pcf8574->digitalRead(_pin) == _active ? HIGH : LOW) {
+			return true;
+		}
+	} else {
+		if (digitalRead(_pin) == _active ? HIGH : LOW) {
+			return true;
+		}
 	}
 	return false;
 }

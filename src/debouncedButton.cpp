@@ -36,7 +36,7 @@ button::button(int pin, PCF8574 &pcf8574, int active, DEBOUNCERANGE debounceTime
 
 boolean button::_readButtonStatus() {
 	if (_pcf8574 != nullptr) {
-		if (_pcf8574->digitalRead(_pin) == _active ? HIGH : LOW) {
+		if (_pcf8574->digitalRead(_pin, true) == _active ? HIGH : LOW) {
 			return true;
 		}
 	} else {

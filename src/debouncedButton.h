@@ -16,12 +16,14 @@ class button {
 	/**
 	 * initialization of button on given pin
      * @param pin: pin number
+	 * @param active: active state, LOW or HIGH
      * @param debounceTimer: pseudo timer for debouncing,
 	 * higher number shorter debounce time, default 1,
      * 1-255 for DEBOUNCERANGE uint8_t,
      * 1-65535 for DEBOUNCERANGE uint16_t
      */
 	button(int pin, DEBOUNCERANGE debounceTimer = 1);
+	button(int pin, int active, DEBOUNCERANGE debounceTimer = 1);
 	/**
 	 * button activated on press
 	 */
@@ -59,4 +61,6 @@ class button {
 	unsigned long _repeatedPress = 0;
 	boolean _press;
 	boolean _longPressLock = false;
+	boolean _active = LOW;
+	boolean _readButtonStatus(int _pin);
 };

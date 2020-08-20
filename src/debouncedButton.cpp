@@ -2,15 +2,30 @@
 
 #include "debouncedButton.h"
 
-button::button(int pin, DEBOUNCERANGE debounceTimer) {
+button::button(int pin, DEBOUNCERANGE debounceTimer)
+    : _pin(pin)
+    , _debounceTimer(debounceTimer)
+    , _active(LOW) {
 	pinMode(pin, INPUT_PULLUP);
-	_pin = pin;
-	_debounceTimer = debounceTimer;
 }
 
-boolean button::press() {
+button::button(int pin, int active, DEBOUNCERANGE debounceTimer)
+    : _pin(pin)
+    , _debounceTimer(debounceTimer)
+    , _active(active) {
+	pinMode(pin, INPUT);
+}
+
+bool button::_readButtonStatus() {
+	if (digitalRead(_pin) == _active ? HIGH : LOW) {
+		return true;
+	}
+	return false;
+}
+
+bool button::press() {
 	_press = false;
-	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_press = true;
 		_buttonPressed = _debounceTimer;
 #if DEBUG
@@ -19,15 +34,15 @@ boolean button::press() {
 		Serial.print(" press: ");
 		Serial.println(_pressTime);
 #endif
-	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 	}
 	return _press;
 }
 
-boolean button::repeat(int _repeatSpeed1, int _repeatSpeed2, int _repeatSpeed2delay) {
+bool button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 	_press = false;
-	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_press = true;
 		_buttonPressed = _debounceTimer;
 		_pressTime = millis();
@@ -37,9 +52,9 @@ boolean button::repeat(int _repeatSpeed1, int _repeatSpeed2, int _repeatSpeed2de
 		Serial.print(" Press: ");
 		Serial.println(_pressTime);
 #endif
-	} else if (_buttonPressed && digitalRead(_pin) == LOW) {    // repeat
-		if (millis() - _pressTime > _repeatSpeed2delay) {
-			if (millis() - _repeatedPress > _repeatSpeed2) {
+	} else if (_buttonPressed && _readButtonStatus()) {    // repeat
+		if (millis() - _pressTime > repeatSpeed2delay) {
+			if (millis() - _repeatedPress > repeatSpeed2) {
 				_repeatedPress = millis();
 				_press = true;
 #if DEBUG
@@ -48,7 +63,7 @@ boolean button::repeat(int _repeatSpeed1, int _repeatSpeed2, int _repeatSpeed2de
 				Serial.println(_repeatedPress);
 #endif
 			}
-		} else if (millis() - _repeatedPress > _repeatSpeed1) {
+		} else if (millis() - _repeatedPress > repeatSpeed1) {
 			_repeatedPress = millis();
 			_press = true;
 #if DEBUG
@@ -57,19 +72,19 @@ boolean button::repeat(int _repeatSpeed1, int _repeatSpeed2, int _repeatSpeed2de
 			Serial.println(_repeatedPress);
 #endif
 		}
-	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 	}
 	return _press;
 }
 
-boolean button::longPress(int _pressDelay) {
+bool button::longPress(int pressDelay) {
 	_press = false;
-	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_longPressLock = false;
 		_buttonPressed = _debounceTimer;
 		_pressTime = millis();
-	} else if (_buttonPressed && millis() - _pressTime > _pressDelay && digitalRead(_pin) == LOW) {    // long press
+	} else if (_buttonPressed && millis() - _pressTime > pressDelay && _readButtonStatus()) {    // long press
 		if (!_longPressLock) {
 			_press = true;
 			_longPressLock = true;
@@ -80,17 +95,17 @@ boolean button::longPress(int _pressDelay) {
 			Serial.println(_releaseTime);
 #endif
 		}
-	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 	}
 	return _press;
 }
 
-boolean button::relese() {
+bool button::relese() {
 	_press = false;
-	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_buttonPressed = _debounceTimer;
-	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 		if (!_buttonPressed) {    // relese
 			_press = true;
@@ -105,9 +120,9 @@ boolean button::relese() {
 	return _press;
 }
 
-boolean button::hold(int _pressDelay) {
+bool button::hold(int pressDelay) {
 	_press = false;
-	if (!_buttonPressed && digitalRead(_pin) == LOW) {    // press
+	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_buttonPressed = _debounceTimer;
 		_pressTime = millis();
 #if DEBUG
@@ -115,9 +130,9 @@ boolean button::hold(int _pressDelay) {
 		Serial.print(" hold start: ");
 		Serial.println(_pressTime);
 #endif
-	} else if (_buttonPressed && millis() - _pressTime > _pressDelay && digitalRead(_pin) == LOW) {    // hold
+	} else if (_buttonPressed && millis() - _pressTime > pressDelay && _readButtonStatus()) {    // hold
 		_press = true;
-	} else if (_buttonPressed && digitalRead(_pin) == HIGH) {    // debounce
+	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 #if DEBUG
 		if (!_buttonPressed) {

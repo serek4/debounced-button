@@ -28,8 +28,8 @@ bool button::press() {
 	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_press = true;
 		_buttonPressed = _debounceTimer;
-#if DEBUG
 		_pressTime = millis();
+#if DEBUG
 		Serial.print(_pin);
 		Serial.print(" press: ");
 		Serial.println(_pressTime);
@@ -84,17 +84,15 @@ bool button::longPress(int pressDelay) {
 		_longPressLock = false;
 		_buttonPressed = _debounceTimer;
 		_pressTime = millis();
-	} else if (_buttonPressed && millis() - _pressTime > pressDelay && _readButtonStatus()) {    // long press
-		if (!_longPressLock) {
-			_press = true;
-			_longPressLock = true;
+	} else if (!_longPressLock && _buttonPressed && millis() - _pressTime > pressDelay && _readButtonStatus()) {    // long press
+		_press = true;
+		_longPressLock = true;
 #if DEBUG
-			_releaseTime = millis();
-			Serial.print(_pin);
-			Serial.print(" LongPress: ");
-			Serial.println(_releaseTime);
+		_releaseTime = millis();
+		Serial.print(_pin);
+		Serial.print(" LongPress: ");
+		Serial.println(_releaseTime);
 #endif
-		}
 	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 	}
@@ -105,10 +103,14 @@ bool button::relese() {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_buttonPressed = _debounceTimer;
+		_pressTime = millis();
 	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
 		if (!_buttonPressed) {    // relese
-			_press = true;
+			if (!_longPressLock) {
+				_press = true;
+			}
+			_longPressLock = false;
 #if DEBUG
 			_releaseTime = millis();
 			Serial.print(_pin);

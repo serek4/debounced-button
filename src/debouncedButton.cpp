@@ -23,6 +23,9 @@ bool button::_readButtonStatus() {
 	return false;
 }
 
+/**
+ * button activated on press
+ */
 bool button::press() {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -40,6 +43,12 @@ bool button::press() {
 	return _press;
 }
 
+/**
+ * button activated repeatedly when held down
+ * @param repeatSpeed1 repeat speed [in milliseconds]
+ * @param repeatSpeed2 repeat speed after speed2delay time [in milliseconds]
+ * @param repeatDelay hold time delay before repeatSpeed2 [in milliseconds]
+ */
 bool button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -78,6 +87,10 @@ bool button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 	return _press;
 }
 
+/**
+ * button activated after specified time
+ * @param pressDelay hold time [in milliseconds]
+ */
 bool button::longPress(int pressDelay) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -99,14 +112,17 @@ bool button::longPress(int pressDelay) {
 	return _press;
 }
 
-bool button::relese() {
+/**
+ * button activated on release
+ */
+bool button::release() {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_buttonPressed = _debounceTimer;
 		_pressTime = millis();
 	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
-		if (!_buttonPressed) {    // relese
+		if (!_buttonPressed) {    // release
 			if (!_longPressLock) {
 				_press = true;
 			}
@@ -114,7 +130,7 @@ bool button::relese() {
 #if DEBUG
 			_releaseTime = millis();
 			Serial.print(_pin);
-			Serial.print(" relese: ");
+			Serial.print(" release: ");
 			Serial.println(_releaseTime);
 #endif
 		}
@@ -122,6 +138,10 @@ bool button::relese() {
 	return _press;
 }
 
+/**
+ * button active as long as it is pressed
+ * @param pressDelay hold time [in milliseconds]
+ */
 bool button::hold(int pressDelay) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press

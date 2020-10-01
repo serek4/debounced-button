@@ -65,5 +65,6 @@ class button {
 	unsigned long _releaseTime = 0;
 #endif
 	PCF8574 *_pcf8574;
+	uint8_t *_pinStatus;
 	bool _readButtonStatus();
 };

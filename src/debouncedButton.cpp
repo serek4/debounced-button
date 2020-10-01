@@ -9,7 +9,7 @@ button::button(int pin, DEBOUNCERANGE debounceTimer)
 	pinMode(pin, INPUT_PULLUP);
 }
 
-button::button(int pin, int active, DEBOUNCERANGE debounceTimer)
+button::button(int pin, bool active, DEBOUNCERANGE debounceTimer)
     : _pin(pin)
     , _debounceTimer(debounceTimer)
     , _active(active) {

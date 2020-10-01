@@ -22,7 +22,7 @@ class button {
      * 1-65535 for DEBOUNCERANGE uint16_t
      */
 	button(int pin, DEBOUNCERANGE debounceTimer = 1);
-	button(int pin, int active, DEBOUNCERANGE debounceTimer = 1);
+	button(int pin, bool active, DEBOUNCERANGE debounceTimer = 1);
 	/**
 	 * button activated on press
 	 */

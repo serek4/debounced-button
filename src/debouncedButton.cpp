@@ -3,22 +3,46 @@
 #include "debouncedButton.h"
 
 button::button(int pin, DEBOUNCERANGE debounceTimer)
-    : _pin(pin)
+    : _customButton(false)
+    , _pinStatus(nullptr)
+    , _pin(pin)
     , _debounceTimer(debounceTimer)
     , _active(LOW) {
 	pinMode(pin, INPUT_PULLUP);
 }
 
 button::button(int pin, bool active, DEBOUNCERANGE debounceTimer)
-    : _pin(pin)
+    : _customButton(false)
+    , _pinStatus(nullptr)
+    , _pin(pin)
     , _debounceTimer(debounceTimer)
     , _active(active) {
 	pinMode(pin, INPUT);
 }
 
+button::button(bool customButton, uint8_t &pinStatus, DEBOUNCERANGE debounceTimer)
+    : _customButton(customButton)
+    , _pinStatus(&pinStatus)
+    , _debounceTimer(debounceTimer)
+    , _active(LOW) {
+}
+
+button::button(bool customButton, uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer)
+    : _customButton(customButton)
+    , _pinStatus(&pinStatus)
+    , _debounceTimer(debounceTimer)
+    , _active(active) {
+}
+
 bool button::_readButtonStatus() {
-	if (digitalRead(_pin) == _active ? HIGH : LOW) {
-		return true;
+	if (_customButton) {
+		if (*_pinStatus == _active ? HIGH : LOW) {
+			return true;
+		}
+	} else {
+		if (digitalRead(_pin) == _active ? HIGH : LOW) {
+			return true;
+		}
 	}
 	return false;
 }

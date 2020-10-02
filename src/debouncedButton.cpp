@@ -3,7 +3,7 @@
 #include "debouncedButton.h"
 
 button::button(int pin, DEBOUNCERANGE debounceTimer)
-    : _pcf8574(nullptr)
+    : _customButton(false)
     , _pinStatus(nullptr)
     , _pin(pin)
     , _debounceTimer(debounceTimer)
@@ -12,7 +12,7 @@ button::button(int pin, DEBOUNCERANGE debounceTimer)
 }
 
 button::button(int pin, bool active, DEBOUNCERANGE debounceTimer)
-    : _pcf8574(nullptr)
+    : _customButton(false)
     , _pinStatus(nullptr)
     , _pin(pin)
     , _debounceTimer(debounceTimer)
@@ -20,84 +20,22 @@ button::button(int pin, bool active, DEBOUNCERANGE debounceTimer)
 	pinMode(pin, INPUT);
 }
 
-button::button(int pin, PCF8574 &pcf8574, DEBOUNCERANGE debounceTimer)
-    : _pcf8574(&pcf8574)
-    , _pinStatus(nullptr)
-    , _pin(pin)
+button::button(bool customButton, uint8_t &pinStatus, DEBOUNCERANGE debounceTimer)
+    : _customButton(customButton)
+    , _pinStatus(&pinStatus)
     , _debounceTimer(debounceTimer)
     , _active(LOW) {
-	_pcf8574->pinMode(_pin, INPUT_PULLUP);
-	switch (_pin) {
-		case P0:
-			_pinStatus = &_pcf8574->digitalInput.p0;
-			break;
-		case P1:
-			_pinStatus = &_pcf8574->digitalInput.p1;
-			break;
-		case P2:
-			_pinStatus = &_pcf8574->digitalInput.p2;
-			break;
-		case P3:
-			_pinStatus = &_pcf8574->digitalInput.p3;
-			break;
-		case P4:
-			_pinStatus = &_pcf8574->digitalInput.p4;
-			break;
-		case P5:
-			_pinStatus = &_pcf8574->digitalInput.p5;
-			break;
-		case P6:
-			_pinStatus = &_pcf8574->digitalInput.p6;
-			break;
-		case P7:
-			_pinStatus = &_pcf8574->digitalInput.p7;
-			break;
-
-		default:
-			break;
-	}
 }
 
-button::button(int pin, PCF8574 &pcf8574, bool active, DEBOUNCERANGE debounceTimer)
-    : _pcf8574(&pcf8574)
-    , _pinStatus(nullptr)
-    , _pin(pin)
+button::button(bool customButton, uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer)
+    : _customButton(customButton)
+    , _pinStatus(&pinStatus)
     , _debounceTimer(debounceTimer)
     , _active(active) {
-	_pcf8574->pinMode(_pin, INPUT);
-	switch (_pin) {
-		case P0:
-			_pinStatus = &_pcf8574->digitalInput.p0;
-			break;
-		case P1:
-			_pinStatus = &_pcf8574->digitalInput.p1;
-			break;
-		case P2:
-			_pinStatus = &_pcf8574->digitalInput.p2;
-			break;
-		case P3:
-			_pinStatus = &_pcf8574->digitalInput.p3;
-			break;
-		case P4:
-			_pinStatus = &_pcf8574->digitalInput.p4;
-			break;
-		case P5:
-			_pinStatus = &_pcf8574->digitalInput.p5;
-			break;
-		case P6:
-			_pinStatus = &_pcf8574->digitalInput.p6;
-			break;
-		case P7:
-			_pinStatus = &_pcf8574->digitalInput.p7;
-			break;
-
-		default:
-			break;
-	}
 }
 
 bool button::_readButtonStatus() {
-	if (_pcf8574 != nullptr) {
+	if (_customButton) {
 		if (*_pinStatus == _active ? HIGH : LOW) {
 			return true;
 		}

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Arduino.h"
-#include <PCF8574.h>
 
 // Serial monitor debug, you need initialize Serial monitor in sketch. [0 = off, 1 = on]
 #ifndef DEBUG
@@ -14,7 +13,8 @@
 
 /**
  * @param pin pin number
- * @param pcf8574 pcf8574 extender object reference
+ * @param customButton flag for button not on uC pin (e.g. PCF8574)
+ * @param pinStatus reference to custom button state
  * @param active active state, LOW or HIGH
  * @param debounceTimer pseudo timer for debouncing,
  * higher number shorter debounce time, default 1,
@@ -25,8 +25,8 @@ class button {
   public:
 	button(int pin, DEBOUNCERANGE debounceTimer = 1);
 	button(int pin, bool active, DEBOUNCERANGE debounceTimer = 1);
-	button(int pin, PCF8574 &pcf8574, DEBOUNCERANGE debounceTimer = 1);
-	button(int pin, PCF8574 &pcf8574, bool active, DEBOUNCERANGE debounceTimer = 1);
+	button(bool customButton, uint8_t &pinStatus, DEBOUNCERANGE debounceTimer = 1);
+	button(bool customButton, uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer = 1);
 	bool press();
 	bool repeat(int repeatSpeed1 = 400, int repeatSpeed2 = 100, int repeatSpeed2delay = 1500);
 	bool longPress(int pressDelay = 2000);
@@ -45,7 +45,7 @@ class button {
 #if DEBUG
 	unsigned long _releaseTime = 0;
 #endif
-	PCF8574 *_pcf8574;
+	bool _customButton;
 	uint8_t *_pinStatus;
 	bool _readButtonStatus();
 };

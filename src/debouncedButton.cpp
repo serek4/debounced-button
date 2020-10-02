@@ -132,6 +132,9 @@ bool button::longPress(int pressDelay) {
 #endif
 	} else if (_buttonPressed && !_readButtonStatus()) {    // debounce
 		_buttonPressed++;
+		if (!_buttonPressed) {
+			_longPressLock = false;
+		}
 	}
 	return _press;
 }

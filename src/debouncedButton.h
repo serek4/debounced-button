@@ -11,22 +11,17 @@
 #define DEBOUNCERANGE uint8_t
 #endif
 
-/**
- * @param pin pin number
- * @param customButton flag for button not on uC pin (e.g. PCF8574)
- * @param pinStatus reference to custom button state
- * @param active active state, LOW or HIGH
- * @param debounceTimer pseudo timer for debouncing,
- * higher number shorter debounce time, default 1,
- * 1-255 for DEBOUNCERANGE uint8_t,
- * 1-65535 for DEBOUNCERANGE uint16_t
- */
-class button {
+#define ACTIVE_LOW false
+#define ACTIVE_HIGH true
+
+class Button {
   public:
-	button(int pin, DEBOUNCERANGE debounceTimer = 1);
-	button(int pin, bool active, DEBOUNCERANGE debounceTimer = 1);
-	button(bool customButton, uint8_t &pinStatus, DEBOUNCERANGE debounceTimer = 1);
-	button(bool customButton, uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer = 1);
+	Button(int pin, DEBOUNCERANGE debounceTimer = 1);
+	Button(int pin, bool active, DEBOUNCERANGE debounceTimer = 1);
+
+	Button(uint8_t &pinStatus, DEBOUNCERANGE debounceTimer = 1);
+	Button(uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer = 1);
+
 	bool press();
 	bool repeat(int repeatSpeed1 = 400, int repeatSpeed2 = 100, int repeatSpeed2delay = 1500);
 	bool longPress(int pressDelay = 2000);

@@ -6,8 +6,8 @@
 boolean led1State = HIGH;
 boolean led2State = HIGH;
 
-button button1(2);
-button button2(3);
+Button button1(2);
+Button button2(3);
 int mode = 0;
 char *modeStr[6] = {"press", "repeat", "long press", "release", "hold", "press"};
 

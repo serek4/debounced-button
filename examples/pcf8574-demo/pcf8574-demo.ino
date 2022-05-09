@@ -8,8 +8,8 @@ boolean led1State = HIGH;
 boolean led2State = HIGH;
 
 PCF8574 keypad(0x20);
-button button1(true, keypad.digitalInput.p0);
-button button2(true, keypad.digitalInput.p1);
+Button button1(keypad.digitalInput.p0);
+Button button2(keypad.digitalInput.p1);
 int mode = 0;
 char *modeStr[6] = {"press", "repeat", "long press", "release", "hold", "press"};
 

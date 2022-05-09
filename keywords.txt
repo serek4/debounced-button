@@ -7,7 +7,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-button  KEYWORD1
+Button  KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

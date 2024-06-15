@@ -1,5 +1,3 @@
-#pragma once
-
 #include "debouncedButton.h"
 
 /**
@@ -45,7 +43,7 @@ Button::Button(int pin, bool active, DEBOUNCERANGE debounceTimer)
  * 1-255 for DEBOUNCERANGE uint8_t,
  * 1-65535 for DEBOUNCERANGE uint16_t
  */
-Button::Button(uint8_t &pinStatus, DEBOUNCERANGE debounceTimer)
+Button::Button(uint8_t& pinStatus, DEBOUNCERANGE debounceTimer)
     : _customButton(true)
     , _pinStatus(&pinStatus)
     , _debounceTimer(debounceTimer)
@@ -59,7 +57,7 @@ Button::Button(uint8_t &pinStatus, DEBOUNCERANGE debounceTimer)
  * 1-255 for DEBOUNCERANGE uint8_t,
  * 1-65535 for DEBOUNCERANGE uint16_t
  */
-Button::Button(uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer)
+Button::Button(uint8_t& pinStatus, bool active, DEBOUNCERANGE debounceTimer)
     : _customButton(true)
     , _pinStatus(&pinStatus)
     , _debounceTimer(debounceTimer)

@@ -11,7 +11,7 @@ PCF8574 keypad(0x20);
 Button button1(keypad.digitalInput.p0);
 Button button2(keypad.digitalInput.p1);
 int mode = 0;
-char *modeStr[6] = {"press", "repeat", "long press", "release", "hold", "press"};
+const char *modeStr[6] = {"press", "repeat", "long press", "release", "hold", "press"};
 
 void setup() {
 	pinMode(LED1, OUTPUT);

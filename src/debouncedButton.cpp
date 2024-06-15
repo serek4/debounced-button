@@ -108,11 +108,11 @@ bool Button::press() {
 
 /**
 * button activated repeatedly when held down
-* @param repeatSpeed1 repeat speed [in milliseconds]
-* @param repeatSpeed2 repeat speed after speed2delay time [in milliseconds]
-* @param repeatDelay hold time delay before repeatSpeed2 [in milliseconds]
+* @param rptSpeed1 repeat speed [in milliseconds]
+* @param rptSpeed2 repeat speed after speed2delay time [in milliseconds]
+* @param rptSpeed2del hold time delay before repeatSpeed2 [in milliseconds]
 */
-bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
+bool Button::repeat(int rptSpeed1, int rptSpeed2, int rptSpeed2del) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_press = true;
@@ -125,8 +125,8 @@ bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 		Serial.println(_pressTime);
 #endif
 	} else if (_buttonPressed && _readButtonStatus()) {    // repeat
-		if (millis() - _pressTime > repeatSpeed2delay) {
-			if (millis() - _repeatedPress > repeatSpeed2) {
+		if (millis() - _pressTime > rptSpeed2del) {
+			if (millis() - _repeatedPress > rptSpeed2) {
 				_repeatedPress = millis();
 				_press = true;
 #if DEBUG
@@ -135,7 +135,7 @@ bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 				Serial.println(_repeatedPress);
 #endif
 			}
-		} else if (millis() - _repeatedPress > repeatSpeed1) {
+		} else if (millis() - _repeatedPress > rptSpeed1) {
 			_repeatedPress = millis();
 			_press = true;
 #if DEBUG

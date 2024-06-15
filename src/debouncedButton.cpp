@@ -22,8 +22,16 @@ Button::Button(int pin, bool active, DEBOUNCERANGE debounceTimer)
     : _customButton(false)
     , _pinStatus(nullptr)
     , _pin(pin)
-    , _debounceTimer(debounceTimer)
-    , _active(active) {
+    , _active(active)
+    , _press(false)
+    , _buttonPressed(0)
+    , _repeatedPress(0)
+    , _longPressLock(false)
+    , _pressTime(0)
+#if DEBUG
+    , _releaseTime(0)
+#endif
+    , _debounceTimer(debounceTimer) {
 	if (active == ACTIVE_LOW) {
 		pinMode(pin, INPUT_PULLUP);
 	} else {
@@ -52,8 +60,17 @@ Button::Button(uint8_t& pinStatus, DEBOUNCERANGE debounceTimer)
 Button::Button(uint8_t& pinStatus, bool active, DEBOUNCERANGE debounceTimer)
     : _customButton(true)
     , _pinStatus(&pinStatus)
-    , _debounceTimer(debounceTimer)
-    , _active(active) {
+    , _pin(255)
+    , _active(active)
+    , _press(false)
+    , _buttonPressed(0)
+    , _repeatedPress(0)
+    , _longPressLock(false)
+    , _pressTime(0)
+#if DEBUG
+    , _releaseTime(0)
+#endif
+    , _debounceTimer(debounceTimer) {
 }
 
 bool Button::_readButtonStatus() {

@@ -33,12 +33,12 @@ class Button {
 	DEBOUNCERANGE _debounceTimer;
 	bool _active;
 	bool _press;
-	DEBOUNCERANGE _buttonPressed = 0;
-	unsigned long _repeatedPress = 0;
-	bool _longPressLock = false;
-	unsigned long _pressTime = 0;
+	DEBOUNCERANGE _buttonPressed;
+	unsigned long _repeatedPress;
+	bool _longPressLock;
+	unsigned long _pressTime;
 #if DEBUG
-	unsigned long _releaseTime = 0;
+	unsigned long _releaseTime;
 #endif
 	bool _customButton;
 	uint8_t* _pinStatus;

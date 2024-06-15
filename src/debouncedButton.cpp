@@ -1,36 +1,37 @@
-#pragma once
-
 #include "debouncedButton.h"
 
 /**
- * @param pin pin number
- * @param debounceTimer pseudo timer for debouncing,
- * higher number shorter debounce time, default 1,
- * 1-255 for DEBOUNCERANGE uint8_t,
- * 1-65535 for DEBOUNCERANGE uint16_t
- */
+* @param pin pin number
+* @param debounceTimer pseudo timer for debouncing,
+* higher number shorter debounce time, default 1,
+* 1-255 for DEBOUNCERANGE uint8_t,
+* 1-65535 for DEBOUNCERANGE uint16_t
+*/
 Button::Button(int pin, DEBOUNCERANGE debounceTimer)
-    : _customButton(false)
-    , _pinStatus(nullptr)
-    , _pin(pin)
-    , _debounceTimer(debounceTimer)
-    , _active(ACTIVE_LOW) {
-	pinMode(pin, INPUT_PULLUP);
+    : Button::Button(pin, ACTIVE_LOW, debounceTimer) {
 }
 /**
- * @param pin pin number
- * @param active active state, ACTIVE_LOW or ACTIVE_HIGH
- * @param debounceTimer pseudo timer for debouncing,
- * higher number shorter debounce time, default 1,
- * 1-255 for DEBOUNCERANGE uint8_t,
- * 1-65535 for DEBOUNCERANGE uint16_t
- */
+* @param pin pin number
+* @param active active state, ACTIVE_LOW or ACTIVE_HIGH
+* @param debounceTimer pseudo timer for debouncing,
+* higher number shorter debounce time, default 1,
+* 1-255 for DEBOUNCERANGE uint8_t,
+* 1-65535 for DEBOUNCERANGE uint16_t
+*/
 Button::Button(int pin, bool active, DEBOUNCERANGE debounceTimer)
     : _customButton(false)
     , _pinStatus(nullptr)
     , _pin(pin)
-    , _debounceTimer(debounceTimer)
-    , _active(active) {
+    , _active(active)
+    , _press(false)
+    , _buttonPressed(0)
+    , _repeatedPress(0)
+    , _longPressLock(false)
+    , _pressTime(0)
+#if DEBUG
+    , _releaseTime(0)
+#endif
+    , _debounceTimer(debounceTimer) {
 	if (active == ACTIVE_LOW) {
 		pinMode(pin, INPUT_PULLUP);
 	} else {
@@ -39,31 +40,37 @@ Button::Button(int pin, bool active, DEBOUNCERANGE debounceTimer)
 }
 
 /**
- * @param pinStatus reference to custom button state
- * @param debounceTimer pseudo timer for debouncing,
- * higher number shorter debounce time, default 1,
- * 1-255 for DEBOUNCERANGE uint8_t,
- * 1-65535 for DEBOUNCERANGE uint16_t
- */
-Button::Button(uint8_t &pinStatus, DEBOUNCERANGE debounceTimer)
-    : _customButton(true)
-    , _pinStatus(&pinStatus)
-    , _debounceTimer(debounceTimer)
-    , _active(ACTIVE_LOW) {
+* @param pinStatus reference to custom button state
+* @param debounceTimer pseudo timer for debouncing,
+* higher number shorter debounce time, default 1,
+* 1-255 for DEBOUNCERANGE uint8_t,
+* 1-65535 for DEBOUNCERANGE uint16_t
+*/
+Button::Button(uint8_t& pinStatus, DEBOUNCERANGE debounceTimer)
+    : Button::Button(pinStatus, ACTIVE_LOW, debounceTimer) {
 }
 /**
- * @param pinStatus reference to custom button state
- * @param active active state, ACTIVE_LOW or ACTIVE_HIGH
- * @param debounceTimer pseudo timer for debouncing,
- * higher number shorter debounce time, default 1,
- * 1-255 for DEBOUNCERANGE uint8_t,
- * 1-65535 for DEBOUNCERANGE uint16_t
- */
-Button::Button(uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer)
+* @param pinStatus reference to custom button state
+* @param active active state, ACTIVE_LOW or ACTIVE_HIGH
+* @param debounceTimer pseudo timer for debouncing,
+* higher number shorter debounce time, default 1,
+* 1-255 for DEBOUNCERANGE uint8_t,
+* 1-65535 for DEBOUNCERANGE uint16_t
+*/
+Button::Button(uint8_t& pinStatus, bool active, DEBOUNCERANGE debounceTimer)
     : _customButton(true)
     , _pinStatus(&pinStatus)
-    , _debounceTimer(debounceTimer)
-    , _active(active) {
+    , _pin(255)
+    , _active(active)
+    , _press(false)
+    , _buttonPressed(0)
+    , _repeatedPress(0)
+    , _longPressLock(false)
+    , _pressTime(0)
+#if DEBUG
+    , _releaseTime(0)
+#endif
+    , _debounceTimer(debounceTimer) {
 }
 
 bool Button::_readButtonStatus() {
@@ -80,8 +87,8 @@ bool Button::_readButtonStatus() {
 }
 
 /**
- * button activated on press
- */
+* button activated on press
+*/
 bool Button::press() {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -100,12 +107,12 @@ bool Button::press() {
 }
 
 /**
- * button activated repeatedly when held down
- * @param repeatSpeed1 repeat speed [in milliseconds]
- * @param repeatSpeed2 repeat speed after speed2delay time [in milliseconds]
- * @param repeatDelay hold time delay before repeatSpeed2 [in milliseconds]
- */
-bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
+* button activated repeatedly when held down
+* @param rptSpeed1 repeat speed [in milliseconds]
+* @param rptSpeed2 repeat speed after speed2delay time [in milliseconds]
+* @param rptSpeed2del hold time delay before repeatSpeed2 [in milliseconds]
+*/
+bool Button::repeat(int rptSpeed1, int rptSpeed2, int rptSpeed2del) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
 		_press = true;
@@ -118,8 +125,8 @@ bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 		Serial.println(_pressTime);
 #endif
 	} else if (_buttonPressed && _readButtonStatus()) {    // repeat
-		if (millis() - _pressTime > repeatSpeed2delay) {
-			if (millis() - _repeatedPress > repeatSpeed2) {
+		if (millis() - _pressTime > rptSpeed2del) {
+			if (millis() - _repeatedPress > rptSpeed2) {
 				_repeatedPress = millis();
 				_press = true;
 #if DEBUG
@@ -128,7 +135,7 @@ bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 				Serial.println(_repeatedPress);
 #endif
 			}
-		} else if (millis() - _repeatedPress > repeatSpeed1) {
+		} else if (millis() - _repeatedPress > rptSpeed1) {
 			_repeatedPress = millis();
 			_press = true;
 #if DEBUG
@@ -144,9 +151,9 @@ bool Button::repeat(int repeatSpeed1, int repeatSpeed2, int repeatSpeed2delay) {
 }
 
 /**
- * button activated after specified time
- * @param pressDelay hold time [in milliseconds]
- */
+* button activated after specified time
+* @param pressDelay hold time [in milliseconds]
+*/
 bool Button::longPress(int pressDelay) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -172,8 +179,8 @@ bool Button::longPress(int pressDelay) {
 }
 
 /**
- * button activated on release
- */
+* button activated on release
+*/
 bool Button::release() {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press
@@ -198,9 +205,9 @@ bool Button::release() {
 }
 
 /**
- * button active as long as it is pressed
- * @param pressDelay hold time [in milliseconds]
- */
+* button active as long as it is pressed
+* @param pressDelay hold time [in milliseconds]
+*/
 bool Button::hold(int pressDelay) {
 	_press = false;
 	if (!_buttonPressed && _readButtonStatus()) {    // press

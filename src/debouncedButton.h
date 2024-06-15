@@ -6,41 +6,48 @@
 #ifndef DEBUG
 #define DEBUG 0
 #endif
-// range for decounce pseudo timer [uint8_t(byte) or uint16_t(unsigned int)], default uint8_t
+// range for debounce pseudo timer [uint8_t(byte) or uint16_t(unsigned int)], default uint8_t
 #ifndef DEBOUNCERANGE
 #define DEBOUNCERANGE uint8_t
 #endif
 
 #define ACTIVE_LOW false
 #define ACTIVE_HIGH true
+// defaults
+#define DEBOUNCE_TIMER 1
+#define REPEAT_SPEED_1 400
+#define REPEAT_SPEED_2 100
+#define REPEAT_SPEED_2_DELAY 1500
+#define LONG_PRESS_DELAY 2000
+#define HOLD_DELAY 0
 
 class Button {
   public:
-	Button(int pin, DEBOUNCERANGE debounceTimer = 1);
-	Button(int pin, bool active, DEBOUNCERANGE debounceTimer = 1);
+	Button(int pin, DEBOUNCERANGE debounceTimer = DEBOUNCE_TIMER);
+	Button(int pin, bool active, DEBOUNCERANGE debounceTimer = DEBOUNCE_TIMER);
 
-	Button(uint8_t &pinStatus, DEBOUNCERANGE debounceTimer = 1);
-	Button(uint8_t &pinStatus, bool active, DEBOUNCERANGE debounceTimer = 1);
+	Button(uint8_t& pinStatus, DEBOUNCERANGE debounceTimer = DEBOUNCE_TIMER);
+	Button(uint8_t& pinStatus, bool active, DEBOUNCERANGE debounceTimer = DEBOUNCE_TIMER);
 
 	bool press();
-	bool repeat(int repeatSpeed1 = 400, int repeatSpeed2 = 100, int repeatSpeed2delay = 1500);
-	bool longPress(int pressDelay = 2000);
+	bool repeat(int rptSpeed1 = REPEAT_SPEED_1, int rptSpeed2 = REPEAT_SPEED_2, int rptSpeed2del = REPEAT_SPEED_2_DELAY);
+	bool longPress(int pressDelay = LONG_PRESS_DELAY);
 	bool release();
-	bool hold(int pressDelay = 0);
+	bool hold(int pressDelay = HOLD_DELAY);
 
   private:
 	int _pin;
 	DEBOUNCERANGE _debounceTimer;
 	bool _active;
 	bool _press;
-	DEBOUNCERANGE _buttonPressed = 0;
-	unsigned long _repeatedPress = 0;
-	bool _longPressLock = false;
-	unsigned long _pressTime = 0;
+	DEBOUNCERANGE _buttonPressed;
+	unsigned long _repeatedPress;
+	bool _longPressLock;
+	unsigned long _pressTime;
 #if DEBUG
-	unsigned long _releaseTime = 0;
+	unsigned long _releaseTime;
 #endif
 	bool _customButton;
-	uint8_t *_pinStatus;
+	uint8_t* _pinStatus;
 	bool _readButtonStatus();
 };

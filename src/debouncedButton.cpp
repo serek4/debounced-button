@@ -8,12 +8,7 @@
  * 1-65535 for DEBOUNCERANGE uint16_t
  */
 Button::Button(int pin, DEBOUNCERANGE debounceTimer)
-    : _customButton(false)
-    , _pinStatus(nullptr)
-    , _pin(pin)
-    , _debounceTimer(debounceTimer)
-    , _active(ACTIVE_LOW) {
-	pinMode(pin, INPUT_PULLUP);
+    : Button::Button(pin, ACTIVE_LOW, debounceTimer) {
 }
 /**
  * @param pin pin number
@@ -44,10 +39,7 @@ Button::Button(int pin, bool active, DEBOUNCERANGE debounceTimer)
  * 1-65535 for DEBOUNCERANGE uint16_t
  */
 Button::Button(uint8_t& pinStatus, DEBOUNCERANGE debounceTimer)
-    : _customButton(true)
-    , _pinStatus(&pinStatus)
-    , _debounceTimer(debounceTimer)
-    , _active(ACTIVE_LOW) {
+    : Button::Button(pinStatus, ACTIVE_LOW, debounceTimer) {
 }
 /**
  * @param pinStatus reference to custom button state
